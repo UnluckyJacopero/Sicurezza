@@ -1,0 +1,64 @@
+
+​Autenticazione: doLogin (POST /login).
+​Utente: setMyUserName, setMyPhoto.
+​Conversazioni: getMyConversations, getConversation.
+​Gruppi: addToGroup, leaveGroup, setGroupName, setGroupPhoto.
+​Messaggi: sendMessage, forwardMessage, deleteMessage.
+​Interazioni: commentMessage (Reazioni), uncommentMessage.
+​Fase 3: Scrittura del file api.yaml
+​Definizione Schemi (Models): In components/schemas, definisci gli oggetti basandoti sulle specifiche funzionali:
+​[cite_start]Utente: Username, foto profilo.  
+​[cite_start]Messaggio: Timestamp, contenuto (testo/foto), mittente, stato (spunte lettura).  
+​[cite_start]Conversazione: Ultimo messaggio, partecipanti, nome gruppo.  
+​Implementazione Autenticazione:
+​[cite_start]Imposta securitySchemes con tipo http e schema bearer.  
+​[cite_start]Ricorda: il login richiede solo username (niente password).  
+​Definizione Endpoint (Paths): Scrivi i path per tutti gli operationId elencati al punto 5.
+​[cite_start]Assicurati di gestire i codici di risposta corretti (es. 200 OK, 201 Created, 404 Not Found).  
+​[cite_start]Per ogni endpoint che non sia il login, aggiungi security: - bearerAuth: [] perché serve l'ID utente nell'header.
+
+Lista Conversazioni: Le conversazioni sono presentate in ordine
+cronologico inverso.
+• Dettagli Lista: Ogni elemento mostra: username/nome del gruppo, foto
+profilo, data/ora dell'ultimo messaggio, e un'anteprima (snippet) del
+messaggio (testo o icona per foto).
+• Nuova Chat: L'utente può avviare nuove conversazioni individuali con
+qualsiasi altro utente WASAText.
+• Ricerca: Possibilità di cercare altri utenti tramite 
+username. 
+• Creazione: Gli utenti possono creare nuovi gruppi con qualsiasi numero
+di altri utenti WASAText.
+• Membri: Solo i membri esistenti possono aggiungere altri utenti. Gli utenti
+non possono unirsi da soli o vedere gruppi di cui non fanno parte.
+• Abbandono: I membri possono lasciare un gruppo in qualsiasi momento.
+• Visualizzazione Chat: I messaggi sono visualizzati in ordine cronologico
+inverso all'interno di una conversazione.
+• Contenuto Messaggio: Include timestamp, contenuto (testo o foto) e
+username del mittente per i messaggi ricevuti.
+• Funzionalità di Messaggistica: L'utente può inviare un nuovo messaggio,
+rispondere a uno esistente, inoltrare un messaggio ed eliminare i propri
+messaggi inviati.
+• Reazioni: Gli utenti possono reagire ai messaggi (commentarli) con un
+emoticon. Le reazioni e i nomi degli utenti che le hanno postate sono
+visualizzati. Le reazioni possono essere eliminate (uncomment).
+• Autenticazione: II login avviene semplicemente inserendo l'username
+(vedi Sezione "Simplified Login").
+• Gestione Profilo: L'utente può aggiornare il proprio nome, purché il
+nuovo nome non sia già in uso.
+Bisogna definire almeno questi operationld.
+
+doLogin
+setMyUserName
+getMyConversations
+getConversation
+sendMessage
+forwardMessage
+commentMessage
+uncommentMessage
+deleteMessage
+addToGroup
+leaveGroup
+setGroupName
+setMyPhoto
+setGroupPhoto
+

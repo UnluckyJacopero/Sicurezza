@@ -1,0 +1,15 @@
+FROM node:lts AS builder
+
+WORKDIR /app
+
+COPY webui/package.json webui/yarn.lock webui/.yarnrc.yml ./
+COPY webui/.yarn ./.yarn
+RUN corepack enable
+RUN yarn install
+
+COPY webui/ .
+RUN yarn run build-prod
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80

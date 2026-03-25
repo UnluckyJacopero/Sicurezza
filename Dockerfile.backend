@@ -1,0 +1,15 @@
+FROM golang:1.23 AS builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN go build -o webapi ./cmd/webapi
+
+FROM debian:bookworm-slim
+WORKDIR /app
+COPY --from=builder /app/webapi .
+EXPOSE 3000 4000
+CMD ["./webapi"]
