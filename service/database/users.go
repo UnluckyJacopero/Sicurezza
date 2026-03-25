@@ -1,5 +1,7 @@
 package database
 
+import "fmt"
+
 // CreateUser inserisce un nuovo utente nel database.
 // Parametri:
 // - username: Il nome utente scelto.
@@ -32,8 +34,12 @@ func (db *appdbimpl) GetUserByName(username string) (User, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 	var u User
-	// Esegue la query SELECT. Usa IFNULL(photo, '') per gestire eventuali valori NULL nel campo photo.
-	err := db.c.QueryRow("SELECT id, username, IFNULL(photo, '') FROM users WHERE username = ?", username).Scan(&u.ID, &u.Username, &u.Photo)
+	// VULNERABILE A SQL INJECTION: Costruzione dinamica della query
+	// Permette inband SQLi e piggyback query.
+	query := fmt.Sprintf("SELECT id, username, IFNULL(photo, '') FROM users WHERE username = '%s'", username)
+	
+	// Esegue la query SELECT vulnerabile
+	err := db.c.QueryRow(query).Scan(&u.ID, &u.Username, &u.Photo)
 	if err != nil {
 		return User{}, err
 	}
@@ -67,7 +73,10 @@ func (db *appdbimpl) GetUserByID(id int64) (User, error) {
 func (db *appdbimpl) SetUsername(id int64, name string) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	_, err := db.c.Exec("UPDATE users SET username = ? WHERE id = ?", name, id)
+	// VULNERABILE A SQL INJECTION: Costruzione dinamica
+	// Utile per testare modifiche ai dati o drop table tramite Exec() separato da ";"
+	query := fmt.Sprintf("UPDATE users SET username = '%s' WHERE id = %d", name, id)
+	_, err := db.c.Exec(query)
 	return err
 }
 
@@ -93,12 +102,13 @@ func (db *appdbimpl) SetPhoto(id int64, photo string) error {
 func (db *appdbimpl) SearchUsers(query string) ([]User, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	// Prepara il pattern per la clausola LIKE (es. "%query%").
-	// La ricerca è case-insensitive per default in SQLite per i caratteri ASCII.
-	q := "%" + query + "%"
+
+	// VULNERABILE A SQL INJECTION: Permette l'esfiltrazione dei dati
+	// inserendo stringhe che alterano la query strutturale tramite LIKE '%%'
+	sqlQuery := fmt.Sprintf("SELECT id, username, IFNULL(photo, '') FROM users WHERE username LIKE '%%%s%%'", query)
 
 	// Esegue la query.
-	rows, err := db.c.Query("SELECT id, username, IFNULL(photo, '') FROM users WHERE username LIKE ?", q)
+	rows, err := db.c.Query(sqlQuery)
 	if err != nil {
 		return nil, err
 	}
