@@ -78,9 +78,9 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// Validazione: lo username deve avere una lunghezza compresa tra 3 e 30 caratteri.
-	if utf8.RuneCountInString(string(input.Name)) < 3 || utf8.RuneCountInString(string(input.Name)) > 30 {
-		rt.sendErrorResponse(w, http.StatusBadRequest, "bad_request", "Username must be between 3 and 30 chars")
+	// Validazione: lo username deve avere una lunghezza compresa tra 3 e 1000 caratteri.
+	if utf8.RuneCountInString(string(input.Name)) < 3 || utf8.RuneCountInString(string(input.Name)) > 1000 {
+		rt.sendErrorResponse(w, http.StatusBadRequest, "bad_request", "Username must be between 3 and 1000 chars")
 		return
 	}
 
